@@ -1,0 +1,43 @@
+ {
+  "manifest_version": 3,
+  "name": "FB Multi-Session",
+  "version": "3.0",
+  "description": "Har tab mein alag Facebook account. SessionBox-style per-tab cookie isolation.",
+  "permissions": [
+    "cookies",
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "browsingData",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "*://*.facebook.com/*",
+    "*://facebook.com/*",
+    "*://web.facebook.com/*",
+    "*://m.facebook.com/*",
+    "*://www.facebook.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "FB Multi-Session"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.facebook.com/*",
+        "*://facebook.com/*",
+        "*://web.facebook.com/*",
+        "*://m.facebook.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ]
+}

@@ -1,0 +1,299 @@
+ <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 380px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1c1e21;
+      max-height: 620px;
+      overflow-y: auto;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1877f2, #0a5dc2);
+      color: #fff;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .logo-circle {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #fff; color: #1877f2;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 20px;
+    }
+    .header h1 { font-size: 15px; font-weight: 600; }
+    .header p { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+
+    .session-status {
+      background: #e7f0fd;
+      border-bottom: 1px solid #d0d7de;
+      padding: 8px 14px;
+      font-size: 11.5px;
+      color: #0a5dc2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .session-status .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #31a24c;
+      animation: pulse 1.5s infinite;
+    }
+    .session-status.no-session .dot { background: #bcc0c4; animation: none; }
+    .session-status.no-session { color: #65676b; background: #f0f2f5; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+
+    /* 🆕 Open All Button */
+    .open-all-wrapper {
+      padding: 12px 14px 6px;
+    }
+    .open-all-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+      letter-spacing: 0.3px;
+    }
+    .open-all-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45);
+    }
+    .open-all-btn:active { transform: translateY(0); }
+    .open-all-btn:disabled {
+      opacity: 0.6;
+      cursor: wait;
+      transform: none;
+    }
+    .open-all-info {
+      text-align: center;
+      font-size: 10.5px;
+      color: #65676b;
+      margin-top: 4px;
+    }
+
+    .upload-wrapper { padding: 6px 14px 12px; }
+    .upload-box {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4px;
+      border: 2px dashed #bcc0c4;
+      border-radius: 10px;
+      padding: 14px 10px;
+      text-align: center;
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .upload-box:hover { border-color: #1877f2; background: #e7f0fd; }
+    .upload-box .title { font-size: 12.5px; font-weight: 600; }
+    .upload-box .sub { font-size: 10.5px; color: #65676b; }
+    .upload-box input { display: none; }
+
+    .section-title {
+      padding: 4px 14px 8px;
+      font-size: 11.5px; font-weight: 600; color: #65676b;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .section-title .count {
+      background: #e4e6eb; color: #1c1e21;
+      padding: 1px 8px; border-radius: 10px; font-size: 10.5px;
+    }
+
+    .account-list {
+      padding: 0 14px 14px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .account-card {
+      display: flex; align-items: center; gap: 10px;
+      background: #fff; border-radius: 10px;
+      padding: 10px 12px;
+      border: 1.5px solid #e4e6eb;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .account-card:hover { border-color: #1877f2; box-shadow: 0 2px 8px rgba(24,119,242,0.12); }
+    .account-card.active { border-color: #31a24c; background: #f2fcf5; }
+    .account-card.active::before {
+      content: ""; position: absolute; left: 0; top: 8px; bottom: 8px;
+      width: 4px; background: #31a24c; border-radius: 4px;
+    }
+
+    .avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #1877f2, #0a5dc2);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 15px; flex-shrink: 0;
+      border: 2px solid #fff; box-shadow: 0 0 0 1px #e4e6eb;
+    }
+    .avatar.active-avatar { box-shadow: 0 0 0 2px #31a24c; }
+
+    .acc-info { flex: 1; min-width: 0; }
+    .acc-name {
+      font-size: 13px; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .acc-meta {
+      font-size: 10.5px; color: #65676b; margin-top: 2px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .active-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: #31a24c; color: #fff;
+      padding: 1px 6px; border-radius: 8px;
+      font-size: 9.5px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .active-badge::before {
+      content: ""; width: 5px; height: 5px; border-radius: 50%;
+      background: #fff;
+    }
+
+    .btn-group {
+      display: flex; gap: 4px; flex-shrink: 0;
+    }
+
+    .btn-action {
+      border: none;
+      padding: 6px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .btn-open { background: #1877f2; color: #fff; }
+    .btn-open:hover { background: #0f5fce; }
+    .btn-apply { background: #e4e6eb; color: #1c1e21; }
+    .btn-apply:hover { background: #d0d3d7; }
+    .btn-delete {
+      background: transparent; border: none;
+      color: #bcc0c4; cursor: pointer;
+      font-size: 13px; padding: 5px;
+      border-radius: 50%; width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-delete:hover { background: #ffebe8; color: #e41e3f; }
+
+    .empty {
+      text-align: center;
+      padding: 30px 20px;
+      color: #65676b;
+    }
+    .empty p { font-size: 12px; }
+
+    .toast {
+      position: fixed; bottom: 14px; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1c1e21; color: #fff;
+      padding: 9px 16px; border-radius: 6px;
+      font-size: 12px; opacity: 0;
+      transition: all 0.3s;
+      z-index: 100; pointer-events: none; white-space: nowrap;
+      max-width: 340px;
+      text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #31a24c; }
+    .toast.error { background: #e41e3f; }
+
+    .clear-session-btn {
+      background: #fff;
+      border: 1.5px solid #e4e6eb;
+      color: #65676b;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0 14px 14px;
+      width: calc(100% - 28px);
+    }
+    .clear-session-btn:hover { border-color: #e41e3f; color: #e41e3f; }
+    .clear-session-btn:disabled { opacity: 0.6; cursor: wait; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #bcc0c4; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-circle">f</div>
+      <div>
+        <h1>FB Multi-Session</h1>
+        <p>Har tab alag account · SessionBox style</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="session-status no-session" id="sessionStatus">
+    <span class="dot"></span>
+    <span id="sessionStatusText">Koi active session nahi is tab par</span>
+  </div>
+
+  <!-- 🆕 OPEN ALL ACCOUNTS BUTTON -->
+  <div class="open-all-wrapper">
+    <button class="open-all-btn" id="openAllBtn">
+      🚀 Open All Accounts (nayi tabs mein)
+    </button>
+    <div class="open-all-info" id="openAllInfo">Upload cookies to enable this</div>
+  </div>
+
+  <div class="upload-wrapper">
+    <label class="upload-box">
+      <span class="title">📁 Cookie file(s) upload karein</span>
+      <span class="sub">.txt / .json — multiple select</span>
+      <input type="file" id="fileInput" accept=".txt,.json" multiple />
+    </label>
+  </div>
+
+  <div class="section-title">
+    <span>Saved Accounts</span>
+    <span class="count" id="accCount">0</span>
+  </div>
+
+  <div class="account-list" id="accountList">
+    <div class="empty">
+      <p>Koi account save nahi hai.<br>Upar se cookie file upload karein.</p>
+    </div>
+  </div>
+
+  <button class="clear-session-btn" id="clearSessionBtn">
+    🧹 Is tab ka session hatao
+  </button>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
